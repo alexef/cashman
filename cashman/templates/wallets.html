@@ -1,0 +1,11 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+    <h3>Wallets</h3>
+
+    <ul>
+      {% for w in wallets %}
+      <li><a href="{{ url_for('.wallet', wallet=w.id) }}">{{ w.name }}</a></li>
+      {% endfor %}
+    </ul>
+{% endblock %}

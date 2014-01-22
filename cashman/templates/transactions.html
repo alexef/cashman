@@ -1,0 +1,27 @@
+{% extends 'layout.html' %}
+
+{% macro transaction(t) %}
+    <li>
+      {{ t.date }}
+      {{ t.amount }}
+      <span class="label label-primary">{{ t.wallet.name }}</span>
+      <span class="label label-default">{{ t.category.name }}</span>
+      <span class="text-muted">{{ t.details or '-' }}</span>
+    </li>
+{% endmacro %}
+
+{% block content %}
+    <h3>Income</h3>
+    <ul>
+      {% for t in ts_in %}
+        {{ transaction(t) }}
+      {% endfor %}
+    </ul>
+
+    <h3>Outcome</h3>
+    <ul>
+      {% for t in ts_out %}
+        {{ transaction(t) }}
+      {% endfor %}
+    </ul>
+{% endblock %}
