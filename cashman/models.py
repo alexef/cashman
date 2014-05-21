@@ -28,7 +28,7 @@ class Wallet(Base):
     active = Column(Boolean)
 
 
-class   Transaction(Base):
+class Transaction(Base):
     __tablename__ = u'transaction'
 
     id = Column(Integer, primary_key=True)
@@ -40,8 +40,10 @@ class   Transaction(Base):
     details = Column(String(512))
 
     category = relationship(Category, backref=backref('transactions',
-                                                      cascade='all'))
-    wallet = relationship(Wallet, foreign_keys=wallet_id)
+                                                      cascade='all',
+                                                      lazy='dynamic'))
+    wallet = relationship(Wallet, foreign_keys=wallet_id,
+                          backref=backref('transactions', lazy='dynamic'))
     wallet_transfer = relationship(Wallet, foreign_keys=transfer_id)
 
     def __unicode__(self):
@@ -114,3 +116,29 @@ def import_csv(csv_path):
                 category = get_category(row['Description'], row['Amount'])
                 add_transaction(wallet, category, row)
         db.session.commit()
+
+
+@db_manager.command
+def convert():
+    card = Wallet.query.filter_by(name='card').first()
+    cash = Wallet.query.filter_by(name='cash').first()
+    transfer = Category.query.filter_by(name='Transfer').first()
+    if not transfer:
+        transfer = Category(name='Transfer')
+        db.session.add(transfer)
+        db.session.flush()
+    card_qs = Category.query.filter_by(name='Card').first().transactions
+    portofel_qs = Category.query.filter_by(name='portofel').first().transactions
+
+    for t in card_qs:
+        print "card:", unicode(t)
+        qs = portofel_qs.filter_by(amount=-t.amount, date=t.date)
+        for p in qs:
+            print " - portofel:", unicode(p)
+            if t.date == p.date:
+                print " - converting"
+                t.wallet_transfer = cash
+                t.category = transfer
+                p.wallet_transfer = card
+                p.category = transfer
+    db.session.commit()
