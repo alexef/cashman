@@ -1,0 +1,16 @@
+{% extends 'layout.html' %}
+
+{% from '_bits.html' import category_type %}
+
+{% block content %}
+    <h3>Categories</h3>
+
+    <ul>
+      {% for c in categories %}
+      <li>
+        {{ category_type(c) }}
+        <a href="{{ url_for('.category', category=c.id) }}">{{ c.name }}</a>
+      </li>
+      {% endfor %}
+    </ul>
+{% endblock %}

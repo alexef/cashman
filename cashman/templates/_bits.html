@@ -10,3 +10,12 @@
   {% endif %}
   </dd>
 {% endmacro %}
+
+{% macro category_type(c) %}
+{% if c.income %}
+  <span class="label label-success"><span class="glyphicon glyphicon-plus"></span></span>
+{% endif %}
+{% if c.outcome %}
+  <span class="label label-danger"><span class="glyphicon glyphicon-minus"></span></span>
+{% endif %}
+{% endmacro %}

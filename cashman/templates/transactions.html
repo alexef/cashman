@@ -1,5 +1,7 @@
 {% extends 'layout.html' %}
 
+{% from "_bits.html" import category_type %}
+
 {% macro transaction(t, hide_wallet=false) %}
     <li>
       {{ t.date.strftime('%d/%m/%y') }}
@@ -12,7 +14,8 @@
     </li>
 {% endmacro %}
 
-{% macro transactions(ts, hide_wallet) %}
+{% macro transactions(ts, total, hide_wallet) %}
+<p>Total: {{ total|int }}</p>
 <ul>
   {% for t in ts %}
     {{ transaction(t, hide_wallet) }}
@@ -23,14 +26,21 @@
 {% block content %}
     {% set hide_wallet = true if wallet else false %}
     {% if wallet %}
-    <h2>{{ wallet.name }} <small>{{ 'active' if wallet.active else 'inactive' }}</small></h2>
-    <a href="{{ url_for('.wallet', wallet=wallet.id) }}">Transactions</a>
-    <a href="{{ url_for('.wallet_graphs', wallet=wallet.id) }}">Graphs</a>
-      {% endif %}
+      <h2>{{ wallet.name }} <small>{{ 'active' if wallet.active else 'inactive' }}</small></h2>
+      <a href="{{ url_for('.wallet', wallet=wallet.id) }}">Transactions</a>
+      <a href="{{ url_for('.wallet_graphs', wallet=wallet.id) }}">Graphs</a>
+    {% endif %}
+    {% if category %}
+      <h2>{{ category.name }} <small>{{ category_type(category) }}</small></h2>
+    {% endif %}
 
+    {% if ts_in.count() %}
     <h3>Income</h3>
-    {{ transactions(ts_in, hide_wallet) }}
+    {{ transactions(ts_in, total_in, hide_wallet) }}
+    {% endif %}
 
+    {% if ts_out.count() %}
     <h3>Outcome</h3>
-    {{ transactions(ts_out, hide_wallet) }}
+    {{ transactions(ts_out, total_out, hide_wallet) }}
+    {% endif %}
 {% endblock %}
