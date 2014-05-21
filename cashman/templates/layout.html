@@ -13,6 +13,15 @@
       <h1>CashMan <small>a simple cash manager</small></h1>
     </div>
 
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+      <ul class=flashes>
+        {% for category, message in messages %}
+        <li class="text-{{ category }}">{{ message }}</li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+    {% endwith %}
     <div class="row">
     {% block content %}
 
@@ -21,6 +30,7 @@
 
     <footer>
       <a href="{{ url_for('.wallets') }}">Wallets</a>
+      <a href="{{ url_for('.add') }}">Add</a>
     </footer>
   </div>
 

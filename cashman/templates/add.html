@@ -1,0 +1,19 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+{% if form.errors %}
+  <p class="text-danger">{{ form.errors }}</p>
+{% endif %}
+
+<form method="post" class="form-inline">
+  {{ form.wallet_id(class='form-control') }}
+  {{ form.direction(class='form-control') }}
+  {{ form.amount(class='form-control', placeholder='0.0') }}
+  {{ form.category_id(class='form-control') }}
+  {{ form.details(class='form-control', placeholder='details') }}
+  {{ form.date(class='form-control', placeholder='yyyy-mm-dd') }}
+
+  <button class="btn btn-primary" type="submit">Add</button>
+</form>
+{% endblock %}
+
