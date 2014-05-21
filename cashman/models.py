@@ -1,5 +1,6 @@
 from datetime import datetime
-from sqlalchemy import (Column, DateTime, ForeignKey, String, Numeric, Integer)
+from sqlalchemy import (Column, DateTime, ForeignKey, String, Numeric, Integer,
+                        Boolean)
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask.ext.script import Manager
 from sqlalchemy.orm import relationship
@@ -14,6 +15,8 @@ class Category(Base):
 
     id = Column(Integer, primary_key=True)
     name = Column(String)
+    income = Column(Boolean)
+    outcome = Column(Boolean)
 
 
 class Wallet(Base):
@@ -21,6 +24,7 @@ class Wallet(Base):
 
     id = Column(Integer, primary_key=True)
     name = Column(String)
+    active = Column(Boolean)
 
 
 class Transaction(Base):
@@ -30,17 +34,20 @@ class Transaction(Base):
     amount = Column(Numeric)
     category_id = Column(ForeignKey(Category.id))
     wallet_id = Column(ForeignKey(Wallet.id))
+    transfer_id = Column(ForeignKey(Wallet.id), nullable=True, default=None)
     date = Column(DateTime)
     details = Column(String)
 
     category = relationship(Category)
-    wallet = relationship(Wallet)
+    wallet = relationship(Wallet, foreign_keys=wallet_id)
+    wallet_transfer = relationship(Wallet, foreign_keys=transfer_id)
 
 
 db_manager = Manager()
 
 @db_manager.command
 def setup():
+    db.create_all()
     c = Category(name='categorie')
     w = Wallet(name='cash')
     db.session.add(c)
