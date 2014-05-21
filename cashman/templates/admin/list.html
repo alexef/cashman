@@ -1,0 +1,24 @@
+{% extends 'admin/layout.html' %}
+
+{% block innercontent %}
+<h2>List</h2>
+
+<table class="table">
+  {% for obj in object_list %}
+  <tr>
+    <td>{{ obj.name }}</td>
+    <td>
+      {% set url = get_edit_url(model, obj.id) %}
+      <a href="{{ url }}" class="btn btn-xs btn-default">
+        <span class="glyphicon glyphicon-edit"></span> edit
+      </a>
+
+      {% set url = get_delete_url(model, obj.id) %}
+      <a href="{{ url }}" class="btn btn-xs btn-danger">
+        <span class="glyphicon glyphicon-remove"></span> remove
+      </a>
+    </td>
+  </tr>
+  {% endfor %}
+</table>
+{% endblock %}

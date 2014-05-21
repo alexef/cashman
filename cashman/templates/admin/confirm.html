@@ -1,0 +1,13 @@
+{% extends 'admin/layout.html' %}
+
+{% block innercontent %}
+<h2>Delete</h2>
+
+<form method="post">
+
+  <p>Are you sure do you want to delete obj #{{ object.id }}?</p>
+
+  <button class="btn btn-danger" type="submit">Delete</button>
+  <a class="btn btn-default" href="{{ url_for('.' + model + '_list') }}">Cancel</a>
+</form>
+{% endblock %}

@@ -28,10 +28,12 @@
     {% endblock %}
     </div>
 
-    <footer>
-      <a href="{{ url_for('.wallets') }}">Wallets</a>
-      <a href="{{ url_for('.add') }}">Add</a>
-    </footer>
+    <div>
+      <hr/>
+      <a href="{{ url_for('views.wallets') }}">Wallets</a>
+      <a href="{{ url_for('views.add') }}">Add</a> |
+      <a href="{{ url_for('admin.home') }}">Admin</a>
+    </div>
   </div>
 
   <script src="http://code.jquery.com/jquery-2.0.3.min.js"></script>
