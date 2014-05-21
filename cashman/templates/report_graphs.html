@@ -7,8 +7,9 @@
     <h3>Income & Outcome</h3>
     {{ graph_double('Income',
       pack_data(income_data, sort=false),
-      pack_data(outcome_data, sort=false))
-    }}
+      pack_data(outcome_data, sort=false),
+      pack_data(all_data, sort=false)
+      ) }}
 
 
 {% endblock %}
@@ -32,6 +33,13 @@
       row = parts[i].split(":");
       data2.push([row[0], parseFloat(row[1])]);
     }
+    var data3 = [];
+    raw_data = $(this).data('data3');
+    parts = raw_data.split(",");
+    for(var i in parts) {
+      row = parts[i].split(":");
+      data3.push([row[0], parseFloat(row[1])]);
+    }
 
     $(this).highcharts({
       title: {
@@ -46,6 +54,9 @@
       }, {
         name: 'Outcome',
         data: data2
+      }, {
+        name: 'Savings',
+        data: data3
       }]
     });
 });

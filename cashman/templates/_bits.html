@@ -26,7 +26,8 @@
     ></div>
 {% endmacro %}
 
-{% macro graph_double(title, data, data2) %}
+{% macro graph_double(title, data, data2, data3=None) %}
 <div class="chart" style="width: 100%; height: 400px;"
-    data-data="{{ data }}" data-data2="{{ data2 }}" data-title="{{ title }}"></div>
+    data-data="{{ data }}" data-data2="{{ data2 }}" {% if data3 %}data-data3="{{ data3 }}"{% endif %}
+    data-title="{{ title }}"></div>
 {% endmacro %}

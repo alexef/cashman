@@ -182,12 +182,23 @@ class ReportView(TransactionView):
                 func.month(Transaction.date),
             )
         )
+        all_data = (
+            basequery
+            .with_entities(
+                func.year(Transaction.date) + '/' + func.month(Transaction.date),
+                func.sum(Transaction.amount))
+            .group_by(
+                func.year(Transaction.date),
+                func.month(Transaction.date),
+            )
+        )
 
         context = self.get_context_data()
         return render_template(
             self.template_name,
             income_data=income_data,
             outcome_data=outcome_data,
+            all_data=all_data,
             **context
         )
 
