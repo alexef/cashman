@@ -19,3 +19,14 @@
   <span class="label label-danger"><span class="glyphicon glyphicon-minus"></span></span>
 {% endif %}
 {% endmacro %}
+
+{% macro graph(title, data) %}
+<div class="chart" style="width: 100%; height: 400px;"
+    data-data="{{ data }}" data-title="{{ title }}"
+    ></div>
+{% endmacro %}
+
+{% macro graph_double(title, data, data2) %}
+<div class="chart" style="width: 100%; height: 400px;"
+    data-data="{{ data }}" data-data2="{{ data2 }}" data-title="{{ title }}"></div>
+{% endmacro %}

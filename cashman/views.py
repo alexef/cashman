@@ -7,6 +7,19 @@ from cashman.models import Transaction, Wallet, db, Category
 
 views = flask.Blueprint('views', __name__)
 
+
+def pack_data(data, sort=True):
+    if sort:
+        data = list(data)
+        data.sort(key=lambda a: a[1])
+    return ','.join([':'.join([str(d) for d in p]) for p in data])
+
+
+@views.app_context_processor
+def inject():
+    return dict(pack_data=pack_data)
+
+
 @views.route('/')
 def homepage():
     return redirect(url_for('.transactions'))
@@ -106,11 +119,6 @@ class GraphView(TransactionView):
 
         basequery = basequery.join(Category)
 
-        def pack_data(data):
-            data = list(data)
-            data.sort(key=lambda a: a[1])
-            return ','.join([':'.join([str(d) for d in p]) for p in data])
-
         income_data = (
             basequery
             .filter(Transaction.amount >= 0)
@@ -139,3 +147,52 @@ views.add_url_rule('/graphs', view_func=GraphView.as_view('graphs'))
 views.add_url_rule('/graphs/w',
                    view_func=WalletGraphView.as_view('wallet_graphs'))
 
+
+class ReportView(TransactionView):
+
+    template_name = 'report.html'
+
+    def __init__(self, *args, **kwargs):
+        if 'template_name' in kwargs:
+            self.template_name = kwargs.pop('template_name')
+        super(ReportView, self).__init__(*args, **kwargs)
+
+    def dispatch_request(self):
+        basequery = self.get_queryset()
+
+        income_data = (
+            basequery
+            .filter(Transaction.amount >= 0)
+            .with_entities(
+                func.year(Transaction.date) + '/' + func.month(Transaction.date),
+                func.sum(Transaction.amount))
+            .group_by(
+                func.year(Transaction.date),
+                func.month(Transaction.date),
+            )
+        )
+        outcome_data = (
+            basequery
+            .filter(Transaction.amount < 0)
+            .with_entities(
+                func.year(Transaction.date) + '/' + func.month(Transaction.date),
+                0 - func.sum(Transaction.amount))
+            .group_by(
+                func.year(Transaction.date),
+                func.month(Transaction.date),
+            )
+        )
+
+        context = self.get_context_data()
+        return render_template(
+            self.template_name,
+            income_data=income_data,
+            outcome_data=outcome_data,
+            **context
+        )
+
+views.add_url_rule('/report', view_func=ReportView.as_view('report'))
+views.add_url_rule('/report/graph',
+                   view_func=ReportView.as_view(
+                       'report_graph',
+                       template_name='report_graphs.html'))

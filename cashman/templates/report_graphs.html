@@ -1,0 +1,53 @@
+{% extends 'layout.html' %}
+
+{% from '_bits.html' import graph_double %}
+
+{% block content %}
+
+    <h3>Income & Outcome</h3>
+    {{ graph_double('Income',
+      pack_data(income_data, sort=false),
+      pack_data(outcome_data, sort=false))
+    }}
+
+
+{% endblock %}
+
+{% block scripts %}
+<script type="text/javascript">
+ $('.chart').each(function () {
+    var data = [], row;
+    var raw_data = $(this).data('data');
+    var parts = raw_data.split(",");
+    var x_axis = [];
+    for(var i in parts) {
+      row = parts[i].split(":");
+      data.push([row[0], parseFloat(row[1])]);
+      x_axis.push(row[0]);
+    }
+    var data2 = [];
+    raw_data = $(this).data('data2');
+    parts = raw_data.split(",");
+    for(var i in parts) {
+      row = parts[i].split(":");
+      data2.push([row[0], parseFloat(row[1])]);
+    }
+
+    $(this).highcharts({
+      title: {
+        text: $(this).data('title')
+      },
+      xAxis: {
+        categories: x_axis
+      },
+      series: [{
+        name: 'Income',
+        data: data
+      }, {
+        name: 'Outcome',
+        data: data2
+      }]
+    });
+});
+</script>
+{% endblock %}

@@ -1,10 +1,6 @@
 {% extends 'layout.html' %}
 
-{% macro graph(data, title) %}
-<div class="chart" style="width: 400px; height: 400px;"
-    data-data="{{ data }}" data-title="{{ title }}"
-    ></div>
-{% endmacro %}
+{% from '_bits.html' import graph %}
 
 {% block content %}
     {% if wallet %}
@@ -14,10 +10,10 @@
     {% endif %}
 
     <h3>Income</h3>
-    {{ graph(income_data, 'Income') }}
+    {{ graph('Income', income_data) }}
 
     <h3>Outcome</h3>
-    {{ graph(outcome_data, 'Outcome') }}
+    {{ graph('Outcome', outcome_data) }}
 
 {% endblock %}
 

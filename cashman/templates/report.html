@@ -1,0 +1,24 @@
+{% extends 'layout.html' %}
+
+{% macro monthlist(data) %}
+  <ul>
+  {% for item in data %}
+    <li>{{ item.0 }} - {{ item.1 }}</li>
+  {% endfor %}
+  </ul>
+{% endmacro %}
+
+{% block content %}
+  <a href="{{ url_for('views.report_graph') }}">Graphs</a>
+
+  {% if income_data.count() %}
+  <h2>Income</h2>
+  {{ monthlist(income_data) }}
+  {% endif %}
+
+  {% if outcome_data.count() %}
+  <h2>Outcome</h2>
+  {{ monthlist(outcome_data) }}
+  {% endif %}
+
+{% endblock %}
