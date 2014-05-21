@@ -83,17 +83,21 @@ class GraphView(fv.View):
         basequery = basequery.join(Category)
 
         def pack_data(data):
+            data = list(data)
+            data.sort(key=lambda a: a[1])
             return ','.join([':'.join([str(d) for d in p]) for p in data])
 
         income_data = (
             basequery
             .filter(Transaction.amount >= 0)
             .with_entities(Category.name, func.sum(Transaction.amount))
+            .group_by(Transaction.category_id)
         )
         outcome_data = (
             basequery
             .filter(Transaction.amount < 0)
             .with_entities(Category.name, 0 - func.sum(Transaction.amount))
+            .group_by(Transaction.category_id)
         )
         context = self.get_context_data()
         return render_template(
