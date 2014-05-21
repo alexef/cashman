@@ -1,3 +1,4 @@
+from csv import DictReader
 from datetime import datetime
 from sqlalchemy import (Column, DateTime, ForeignKey, String, Numeric, Integer,
                         Boolean)
@@ -42,6 +43,9 @@ class Transaction(Base):
     wallet = relationship(Wallet, foreign_keys=wallet_id)
     wallet_transfer = relationship(Wallet, foreign_keys=transfer_id)
 
+    def __unicode__(self):
+        return '%s %s' % (self.date, self.amount)
+
 
 db_manager = Manager()
 
@@ -57,3 +61,55 @@ def setup():
     db.session.add(t)
     db.session.commit()
     print "Done!"
+
+
+@db_manager.command
+def import_csv(csv_path):
+    def get_wallet(name):
+        wallet = Wallet.query.filter_by(name=name).first()
+        if not wallet:
+            wallet = Wallet(name=name)
+            db.session.add(wallet)
+            db.session.flush()
+        return wallet
+
+    def get_category(name, amount):
+        category = Category.query.filter_by(name=name).first()
+        if not category:
+            category = Category(name=name, income=(amount >= 0),
+                                outcome=(amount < 0))
+            db.session.add(category)
+            db.session.flush()
+        return category
+
+    def add_transaction(wallet, category, data):
+        filters = dict(
+            wallet=wallet, category=category,
+            date=data['Date'], amount=data['Amount'], details=data['Note'],
+        )
+        transaction = Transaction.query.filter_by(**filters).first()
+        if not transaction:
+            transaction = Transaction(**filters)
+            db.session.add(transaction)
+            print "Adding new", unicode(transaction)
+        else:
+            print "Skipping existing", unicode(transaction)
+        return transaction
+
+    transfers = []
+    with open(csv_path, 'r') as fin:
+        reader = DictReader(fin)
+
+        for row in reader:
+            row['Amount'] = float(row['Amount'])
+            row['Date'] = datetime.strptime(row['Date'], '%Y-%m-%d')
+            row['Note'] = unicode(row['Note'], 'utf-8')
+            row['Description'] = unicode(row['Description'])
+            row['Wallet'] = row['Wallet'][1:]
+            if row['Description'] == 'Transfer':
+                transfers.append(row)
+            else:
+                wallet = get_wallet(row['Wallet'])
+                category = get_category(row['Description'], row['Amount'])
+                add_transaction(wallet, category, row)
+        db.session.commit()
