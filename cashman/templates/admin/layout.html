@@ -3,12 +3,17 @@
 {% block content %}
 <div class="row">
   <div class="col-xs-3">
-    <h2>Admin</h2>
-    <ul class="nav">
-      {% for model in modules %}
-      <li><a href="{{ url_for('.' + model + '_list') }}">{{ model|capitalize }}</a></li>
-      {% endfor %}
-    </ul>
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title">Admin</h3>
+      </div>
+      <div class="list-group">
+        {% for m in modules %}
+        <a class="list-group-item{% if model == m %} active{% endif %}"
+           href="{{ get_list_url(m) }}">{{ m|capitalize }}</a>
+        {% endfor %}
+      </div>
+    </div>
   </div>
 
   <div class="col-xs-9">
