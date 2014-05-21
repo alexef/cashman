@@ -11,6 +11,8 @@
       {% endif %}
       <span class="label label-default">{{ t.category.name }}</span>
       <span class="text-muted">{{ t.details or '-' }}</span>
+
+      <a href="{{ url_for('views.edit', id=t.id) }}" class="btn btn-default btn-xs">change</a>
     </li>
 {% endmacro %}
 

@@ -20,3 +20,16 @@ class AddForm(Form):
         self.category_id.choices = (
             Category.query.with_entities(cast(Category.id, String), Category.name)
         )
+
+
+class EditForm(Form):
+    date = DateField()
+    amount = FloatField()
+    category_id = SelectField()
+    details = StringField(validators=[Optional()])
+
+    def __init__(self, *args, **kwargs):
+        super(EditForm, self).__init__(*args, **kwargs)
+        self.category_id.choices = (
+            Category.query.with_entities(cast(Category.id, String), Category.name)
+        )

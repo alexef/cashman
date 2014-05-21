@@ -1,0 +1,16 @@
+{% extends 'layout.html' %}
+
+{% from '_bits.html' import render_field %}
+
+{% block content %}
+<h2>Edit</h2>
+
+<form method="post">
+
+  {% for field in form %}
+    {{ render_field(field, class='form-control') }}
+  {% endfor %}
+
+  <button class="btn btn-primary" type="submit">Update</button>
+</form>
+{% endblock %}

@@ -3,7 +3,7 @@ import flask
 from flask import views as fv, render_template, request, flash, redirect,\
     url_for
 from sqlalchemy import func
-from cashman.forms import AddForm
+from cashman.forms import AddForm, EditForm
 from cashman.models import Transaction, Wallet, db, Category
 
 views = flask.Blueprint('views', __name__)
@@ -53,6 +53,18 @@ def add():
         form = AddForm()
 
     return render_template('add.html', form=form)
+
+@views.route('/edit/<int:id>', methods=['GET', 'POST'])
+def edit(id):
+    transaction = Transaction.query.get_or_404(id)
+    form = EditForm(request.form, transaction)
+    if request.method == 'POST':
+        if form.validate():
+            form.populate_obj(transaction)
+            db.session.commit()
+            flash('Transaction updated!', 'success')
+
+    return render_template('edit.html', form=form)
 
 
 class WalletMixin(object):

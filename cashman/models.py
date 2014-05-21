@@ -28,7 +28,7 @@ class Wallet(Base):
     active = Column(Boolean)
 
 
-class Transaction(Base):
+class   Transaction(Base):
     __tablename__ = u'transaction'
 
     id = Column(Integer, primary_key=True)
