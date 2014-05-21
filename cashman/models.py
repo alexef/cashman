@@ -15,7 +15,7 @@ class Category(Base):
     __tablename__ = u'category'
 
     id = Column(Integer, primary_key=True)
-    name = Column(String)
+    name = Column(String(255))
     income = Column(Boolean)
     outcome = Column(Boolean)
 
@@ -24,7 +24,7 @@ class Wallet(Base):
     __tablename__ = u'wallet'
 
     id = Column(Integer, primary_key=True)
-    name = Column(String)
+    name = Column(String(255))
     active = Column(Boolean)
 
 
@@ -37,7 +37,7 @@ class Transaction(Base):
     wallet_id = Column(ForeignKey(Wallet.id))
     transfer_id = Column(ForeignKey(Wallet.id), nullable=True, default=None)
     date = Column(DateTime)
-    details = Column(String)
+    details = Column(String(512))
 
     category = relationship(Category)
     wallet = relationship(Wallet, foreign_keys=wallet_id)
