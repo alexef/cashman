@@ -4,7 +4,7 @@ from sqlalchemy import (Column, DateTime, ForeignKey, String, Numeric, Integer,
                         Boolean)
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask.ext.script import Manager
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, backref
 
 
 db = SQLAlchemy()
@@ -39,7 +39,8 @@ class Transaction(Base):
     date = Column(DateTime)
     details = Column(String(512))
 
-    category = relationship(Category)
+    category = relationship(Category, backref=backref('transactions',
+                                                      cascade='all'))
     wallet = relationship(Wallet, foreign_keys=wallet_id)
     wallet_transfer = relationship(Wallet, foreign_keys=transfer_id)
 

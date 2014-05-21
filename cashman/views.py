@@ -1,3 +1,4 @@
+from datetime import datetime
 import flask
 from flask import views as fv, render_template, request, flash, redirect,\
     url_for
@@ -57,32 +58,71 @@ def add():
 class WalletMixin(object):
 
     def get_context_data(self):
+        context = super(WalletMixin, self).get_context_data()
         wallet_id = flask.request.args.get('wallet')
-        return {'wallet': Wallet.query.get_or_404(wallet_id)}
+        context.update({'wallet': Wallet.query.get_or_404(wallet_id)})
+        return context
 
     def get_queryset(self):
         wallet_id = flask.request.args.get('wallet')
-        return Transaction.query.filter(Transaction.wallet_id == wallet_id)
+        qs = super(WalletMixin, self).get_queryset()
+        return qs.filter(Transaction.wallet_id == wallet_id)
 
 
 class CategoryMixin(object):
 
     def get_context_data(self):
+        context = super(CategoryMixin, self).get_context_data()
         cat_id = request.args.get('category')
-        return {'category': Category.query.get_or_404(cat_id)}
+        context.update({'category': Category.query.get_or_404(cat_id)})
+        return context
 
     def get_queryset(self):
         cat_id = request.args.get('category')
-        return Transaction.query.filter(Transaction.category_id == cat_id)
+        qs = super(CategoryMixin, self).get_queryset()
+        return qs.filter(Transaction.category_id == cat_id)
 
 
 class TransactionView(fv.View):
 
+    def extract_interval(self):
+        start, end = None, None
+        if 'start' in request.args:
+            try:
+                start = datetime.strptime(request.args['start'], '%Y-%m-%d')
+            except ValueError:
+                pass
+        if 'end' in request.args:
+            try:
+                end = datetime.strptime(request.args['end'], '%Y-%m-%d')
+            except ValueError:
+                pass
+        return start, end
+
     def get_context_data(self):
-        return {}
+        start, end = self.extract_interval()
+        if not start:
+            start = (
+                Transaction.query
+                .with_entities(func.min(Transaction.date))
+                .first()
+            )[0]
+        if not end:
+            end = (
+                Transaction.query
+                .with_entities(func.max(Transaction.date))
+                .first()
+            )[0]
+        return {'start': start, 'end': end}
 
     def get_queryset(self):
-        return Transaction.query
+        qs = Transaction.query
+        start, end = self.extract_interval()
+        if start:
+            qs = qs.filter(Transaction.date >= start)
+        if end:
+            qs = qs.filter(Transaction.date <= end)
+        return qs
 
     def dispatch_request(self):
         basequery = self.get_queryset()
@@ -116,7 +156,6 @@ class GraphView(TransactionView):
 
     def dispatch_request(self):
         basequery = self.get_queryset()
-
         basequery = basequery.join(Category)
 
         income_data = (
