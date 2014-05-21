@@ -59,12 +59,12 @@ class WalletMixin(object):
 
     def get_context_data(self):
         context = super(WalletMixin, self).get_context_data()
-        wallet_id = flask.request.args.get('wallet')
+        wallet_id = self.kwargs.get('wallet')
         context.update({'wallet': Wallet.query.get_or_404(wallet_id)})
         return context
 
     def get_queryset(self):
-        wallet_id = flask.request.args.get('wallet')
+        wallet_id = self.kwargs.get('wallet')
         qs = super(WalletMixin, self).get_queryset()
         return qs.filter(Transaction.wallet_id == wallet_id)
 
@@ -124,7 +124,8 @@ class TransactionView(fv.View):
             qs = qs.filter(Transaction.date <= end)
         return qs
 
-    def dispatch_request(self):
+    def dispatch_request(self, **kwargs):
+        self.kwargs = kwargs
         basequery = self.get_queryset()
         ts_in = basequery.filter(Transaction.amount >= 0)
         ts_out = basequery.filter(Transaction.amount < 0)
@@ -148,13 +149,14 @@ class CategoryView(CategoryMixin, TransactionView):
 
 
 views.add_url_rule('/t', view_func=TransactionView.as_view('transactions'))
-views.add_url_rule('/w', view_func=WalletView.as_view('wallet'))
+views.add_url_rule('/w/<int:wallet>/', view_func=WalletView.as_view('wallet'))
 views.add_url_rule('/c', view_func=CategoryView.as_view('category'))
 
 
 class GraphView(TransactionView):
 
-    def dispatch_request(self):
+    def dispatch_request(self, **kwargs):
+        self.kwargs = kwargs
         basequery = self.get_queryset()
         basequery = basequery.join(Category)
 
@@ -183,7 +185,7 @@ class WalletGraphView(WalletMixin, GraphView):
     pass
 
 views.add_url_rule('/graphs', view_func=GraphView.as_view('graphs'))
-views.add_url_rule('/graphs/w',
+views.add_url_rule('/graphs/w/<int:wallet>/',
                    view_func=WalletGraphView.as_view('wallet_graphs'))
 
 
@@ -196,7 +198,8 @@ class ReportView(TransactionView):
             self.template_name = kwargs.pop('template_name')
         super(ReportView, self).__init__(*args, **kwargs)
 
-    def dispatch_request(self):
+    def dispatch_request(self, **kwargs):
+        self.kwargs = kwargs
         basequery = self.get_queryset()
 
         income_data = (

@@ -9,11 +9,15 @@
     <a href="{{ url_for('.wallet_graphs', wallet=wallet.id) }}">Graphs</a>
     {% endif %}
 
-    <h3>Income</h3>
-    {{ graph('Income', income_data) }}
+    <div>
+      <div class="col-xs-6">
+        {{ graph('Income', income_data) }}
+      </div>
+      <div class="col-xs-6">
+        {{ graph('Outcome', outcome_data) }}
+      </div>
+    </div>
 
-    <h3>Outcome</h3>
-    {{ graph('Outcome', outcome_data) }}
 
 {% endblock %}
 
