@@ -1,0 +1,45 @@
+{% extends 'layout.html' %}
+
+{% macro graph(data, title) %}
+<div class="chart" style="width: 400px; height: 400px;"
+    data-data="{{ data }}" data-title="{{ title }}"
+    ></div>
+{% endmacro %}
+
+{% block content %}
+    {% if wallet %}
+    <h2>{{ wallet.name }} <small>{{ 'active' if wallet.active else 'inactive' }}</small></h2>
+    <a href="{{ url_for('.wallet', wallet=wallet.id) }}">Transactions</a>
+    <a href="{{ url_for('.wallet_graphs', wallet=wallet.id) }}">Graphs</a>
+    {% endif %}
+
+    <h3>Income</h3>
+    {{ graph(income_data, 'Income') }}
+
+    <h3>Outcome</h3>
+    {{ graph(outcome_data, 'Outcome') }}
+
+{% endblock %}
+
+{% block scripts %}
+<script type="text/javascript">
+ $('.chart').each(function () {
+    var data = [], row;
+    var raw_data = $(this).data('data');
+    var parts = raw_data.split(",");
+    for(var i in parts) {
+      row = parts[i].split(":");
+      data.push([row[0], parseFloat(row[1])]);
+    }
+    $(this).highcharts({
+      title: {
+        text: $(this).data('title')
+      },
+      series: [{
+        type: 'pie',
+        data: data
+      }]
+    });
+});
+</script>
+{% endblock %}

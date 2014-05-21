@@ -31,6 +31,10 @@
     <div>
       <hr/>
       <a href="{{ url_for('views.wallets') }}">Wallets</a>
+
+      <a href="{{ url_for('views.transactions') }}">Transactions</a>
+      <a href="{{ url_for('views.graphs') }}">Graphs</a>
+
       <a href="{{ url_for('views.add') }}">Add</a> |
       <a href="{{ url_for('admin.home') }}">Admin</a>
     </div>
@@ -39,5 +43,9 @@
   <script src="http://code.jquery.com/jquery-2.0.3.min.js"></script>
   <script type="text/javascript"
           src="//netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>
+  <script type="text/javascript"
+          src="//cdnjs.cloudflare.com/ajax/libs/highcharts/4.0.1/highcharts.js"></script>
+  {% block scripts %}
+  {% endblock %}
 </body>
 </html>

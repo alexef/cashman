@@ -12,23 +12,25 @@
     </li>
 {% endmacro %}
 
+{% macro transactions(ts, hide_wallet) %}
+<ul>
+  {% for t in ts %}
+    {{ transaction(t, hide_wallet) }}
+  {% endfor %}
+</ul>
+{% endmacro %}
+
 {% block content %}
     {% set hide_wallet = true if wallet else false %}
     {% if wallet %}
-    <h2>{{ wallet.name }}</h2>
-    {% endif %}
+    <h2>{{ wallet.name }} <small>{{ 'active' if wallet.active else 'inactive' }}</small></h2>
+    <a href="{{ url_for('.wallet', wallet=wallet.id) }}">Transactions</a>
+    <a href="{{ url_for('.wallet_graphs', wallet=wallet.id) }}">Graphs</a>
+      {% endif %}
 
     <h3>Income</h3>
-    <ul>
-      {% for t in ts_in %}
-        {{ transaction(t, hide_wallet) }}
-      {% endfor %}
-    </ul>
+    {{ transactions(ts_in, hide_wallet) }}
 
     <h3>Outcome</h3>
-    <ul>
-      {% for t in ts_out %}
-        {{ transaction(t, hide_wallet) }}
-      {% endfor %}
-    </ul>
+    {{ transactions(ts_out, hide_wallet) }}
 {% endblock %}
