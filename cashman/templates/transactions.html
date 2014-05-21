@@ -1,27 +1,34 @@
 {% extends 'layout.html' %}
 
-{% macro transaction(t) %}
+{% macro transaction(t, hide_wallet=false) %}
     <li>
-      {{ t.date }}
-      {{ t.amount }}
+      {{ t.date.strftime('%d/%m/%y') }}
+      <span class="badge">{{ t.amount|round|int }}</span>
+      {% if not hide_wallet %}
       <span class="label label-primary">{{ t.wallet.name }}</span>
+      {% endif %}
       <span class="label label-default">{{ t.category.name }}</span>
       <span class="text-muted">{{ t.details or '-' }}</span>
     </li>
 {% endmacro %}
 
 {% block content %}
+    {% set hide_wallet = true if wallet else false %}
+    {% if wallet %}
+    <h2>{{ wallet.name }}</h2>
+    {% endif %}
+
     <h3>Income</h3>
     <ul>
       {% for t in ts_in %}
-        {{ transaction(t) }}
+        {{ transaction(t, hide_wallet) }}
       {% endfor %}
     </ul>
 
     <h3>Outcome</h3>
     <ul>
       {% for t in ts_out %}
-        {{ transaction(t) }}
+        {{ transaction(t, hide_wallet) }}
       {% endfor %}
     </ul>
 {% endblock %}

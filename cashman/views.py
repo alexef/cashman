@@ -39,6 +39,9 @@ def add():
     
 class TransactionView(fv.View):
 
+    def get_context_data(self):
+        return {}
+
     def get_queryset(self):
         return Transaction.query
 
@@ -46,12 +49,17 @@ class TransactionView(fv.View):
         basequery = self.get_queryset()
         ts_in = basequery.filter(Transaction.amount >= 0)
         ts_out = basequery.filter(Transaction.amount < 0)
+        context = self.get_context_data()
         return render_template(
-            'transactions.html', ts_in=ts_in, ts_out=ts_out,
+            'transactions.html', ts_in=ts_in, ts_out=ts_out, **context
         )
 
 
 class WalletView(TransactionView):
+
+    def get_context_data(self):
+        wallet_id = flask.request.args.get('wallet')
+        return {'wallet': Wallet.query.get_or_404(wallet_id)}
 
     def get_queryset(self):
         wallet_id = flask.request.args.get('wallet')
