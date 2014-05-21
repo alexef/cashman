@@ -20,9 +20,14 @@ def get_delete_url(model, id):
     return url_for('.%s_delete' % model, id=id)
 
 
+def get_add_url(model):
+    return url_for('.%s_add' % model, id=id)
+
+
 class ModelAdmin(View):
 
     template_list = 'admin/list.html'
+    template_add = 'admin/add.html'
     template_edit = 'admin/edit.html'
     template_confirm = 'admin/confirm.html'
 
@@ -35,6 +40,26 @@ class ModelAdmin(View):
         return render_template(
             cls.template_list,
             object_list=cls.model.query.all(),
+            model=cls.name(),
+        )
+
+    @classmethod
+    def add(cls):
+        form_cls = model_form(cls.model)
+        form = form_cls(request.form)
+
+        if request.method == 'POST':
+            if form.validate():
+                object = cls.model()
+                form.populate_obj(object)
+                db.session.add(object)
+                db.session.commit()
+                flash('Added', 'success')
+                return redirect(get_list_url(cls.name()))
+
+        return render_template(
+            cls.template_add,
+            form=form,
             model=cls.name(),
         )
 
@@ -75,6 +100,9 @@ class ModelAdmin(View):
     def register(cls, app):
         model = cls.model.__tablename__
         app.route('/%s/list/' % model, endpoint='%s_list' % model)(cls.list)
+        app.route('/%s/add/' % model,
+                  endpoint='%s_add' % model,
+                  methods=('GET', 'POST'))(cls.add)
         app.route('/%s/<int:id>/edit/' % model,
                   endpoint='%s_edit' % model,
                   methods=('GET', 'POST'))(cls.edit)
@@ -102,6 +130,7 @@ def inject():
         get_list_url=get_list_url,
         get_edit_url=get_edit_url,
         get_delete_url=get_delete_url,
+        get_add_url=get_add_url,
         modules=admin.registered,
     )
 

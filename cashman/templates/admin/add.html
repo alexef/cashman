@@ -3,7 +3,7 @@
 {% from '_bits.html' import render_field %}
 
 {% block innercontent %}
-<h2>Edit</h2>
+<h2>Add {{ model }}</h2>
 
 <form method="post">
 
@@ -11,7 +11,7 @@
     {{ render_field(field) }}
   {% endfor %}
 
-  <button class="btn btn-primary" type="submit">Update</button>
+  <button class="btn btn-primary" type="submit">Add</button>
   <a class="btn btn-default" href="{{ url_for('.' + model + '_list') }}">Cancel</a>
 </form>
 {% endblock %}
